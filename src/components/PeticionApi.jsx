@@ -40,6 +40,8 @@ const PeticionApi = () => {
                     <div class="card" key = {id}>
                         <h4 key={id}>{id} - {name}</h4>
                         <div class="card-info">
+                        <img class="imagen" src = {thumbnail.path+'.'+thumbnail.extension} alt = {name}/>
+                        <span>{description}</span>
                         </div>
                     </div>
                     </div>
