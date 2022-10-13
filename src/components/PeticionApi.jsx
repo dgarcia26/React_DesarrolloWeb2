@@ -2,29 +2,63 @@ import React from 'react'
 
 const PeticionApi = () => {
     const [personajes, setPersonajes] = React.useState([])
-    const [paginacion, setPaginacion] = React.useState(1)
+    
+    
+    let limite = 20;
+    let offset = 0;
+    let totalItems = 100;
+    const itemsPagina = 20;
+    let cantPagina = 1;
 
-    const obtenerPersonajes = async () => {
+    const obtenerPersonajes = async (offset=0, limite=29) => {
         try {
-          console.log('paginación: '+paginacion)
-          const res = await fetch(`https://gateway.marvel.com/v1/public/characters?limit=5&offset=1&ts=1&apikey=c35c2fa460990e739d0dbdd3f44b8eda&hash=aa93429adafb6d018a1bf1e9be2c2b8f`);
-          console.log(`https://rickandmortyapi.com/api/character/?page=${paginacion}`)
+          
+          const res = await fetch(`https://gateway.marvel.com/v1/public/characters?limit=${limite}&offset=${offset}&ts=1&apikey=c35c2fa460990e739d0dbdd3f44b8eda&hash=aa93429adafb6d018a1bf1e9be2c2b8f`);
+          
           const data = await res.json();
           const results = await data.data.results;
+          cantPagina = Math.ceil(totalItems/itemsPagina);
+          let elemento = document.getElementById("selector");
+          while (elemento.firstChild) {
+          elemento.removeChild(elemento.firstChild);
+          }
+          llenarSelect();
           setPersonajes(results)
         } catch (error) {
           console.log(error);
         }
       };
 
-    const siguiente= async ()  => {
-        await setPaginacion(paginacion+1);
-        obtenerPersonajes();
+
+      const cambiarPagina= async ()  => {
+        let rest = document.getElementById("selector");
+        
+        
+          offset = (rest.value * itemsPagina) - itemsPagina+1;
+          limite =  rest.value * itemsPagina;
+          
+          
+        
+        obtenerPersonajes(offset, limite);
+
     }
-    const atras= async() => {
-        await setPaginacion(paginacion-1)
-        obtenerPersonajes();
+
+
+    
+    const llenarSelect = async() => {
+      let rest = document.getElementById("selector");
+      for (let i = 1; i <= cantPagina; i++) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.text = i;
+        rest.appendChild(option);
+        
+      }
     }
+    
+      
+      
+    
     
    
 
@@ -32,8 +66,21 @@ const PeticionApi = () => {
     <>
         <h1>PETICIÓN AL API DE MARVEL</h1>
         <button onClick={obtenerPersonajes}>Traer Personajes</button>
-        <button onClick={siguiente}>Siguiente</button>
-        <button onClick={atras}>Atrás</button>
+        <div class="paginator">
+          
+          {
+           <select name="cars" id="selector" onChange={cambiarPagina}>
+           
+          </select> 
+          }
+                
+          
+              
+          
+            
+          
+        </div>
+    
         {
                 personajes.map(({id, name, description, thumbnail})=> (
                     <div  class="container">
@@ -46,8 +93,10 @@ const PeticionApi = () => {
                     </div>
                     </div>
                 ))
+                
+               
         }
-    </>
+        </>
   )
 }
 
